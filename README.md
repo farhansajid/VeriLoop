@@ -11,7 +11,6 @@
 > **"VeriLoop: Verifiable Digital Service Loops for IoT-Enabled Remote Patient Monitoring"**  
 > *Target Venue:* **IEEE Internet of Things Magazine**  
 > *Special Issue on Digital Service Loops for IoT-Enabled Connected Healthcare Systems*  
-> *Authors:* Dr. Muhammad Farhan, Dr. Khalid Mahmood, and Collaborators
 
 ---
 
