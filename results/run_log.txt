@@ -1,0 +1,12 @@
+risk model: {'n_train': 259200, 'pos_rate': 0.03681712962962963, 'val_auroc': 0.993563248260908, 'val_auprc': 0.9012088724247332, 'val_pos_rate': 0.03957561728395062}
+simulated 6750 patient-weeks in 955 s
+spot_news2   adverse  64.5±4.0  lead 1.70h  FA/pd 0.37  clin/pd 0.50  duty 2%  up 0.6KB
+cont_news2   adverse  18.6±6.0  lead 2.91h  FA/pd 0.96  clin/pd 1.28  duty 100%  up 28.1KB
+openloop_ml  adverse  11.7±3.9  lead 4.58h  FA/pd 1.49  clin/pd 1.84  duty 100%  up 28.1KB
+veriloop     adverse   5.7±2.5  lead 4.27h  FA/pd 0.59  clin/pd 1.07  duty 54%  up 11.6KB
+no_faultdx   adverse   5.7±2.9  lead 4.52h  FA/pd 1.68  clin/pd 2.20  duty 57%  up 13.1KB
+no_verify    adverse  10.4±3.2  lead 4.28h  FA/pd 0.49  clin/pd 0.84  duty 54%  up 11.6KB
+no_adapt     adverse   6.1±2.3  lead 4.34h  FA/pd 0.73  clin/pd 1.21  duty 55%  up 12.2KB
+cloud        adverse   5.5±1.5  lead 4.23h  FA/pd 0.59  clin/pd 1.09  duty 54%  up 15.1KB
+no_adsamp    adverse   4.5±2.3  lead 4.30h  FA/pd 0.73  clin/pd 1.21  duty 100%  up 12.2KB
+done in 955 s

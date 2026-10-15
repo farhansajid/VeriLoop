@@ -1,0 +1,96 @@
+% Fig. 3: evaluation methodology (closed-loop simulation pipeline)
+\begin{tikzpicture}[
+  font=\sffamily\scriptsize,
+  >={Stealth[length=4.5pt]},
+  panel/.style={rounded corners=5pt, draw=#1!45!gray, fill=#1!5, line width=0.6pt},
+  ptitle/.style={font=\sffamily\scriptsize\bfseries, text=#1!55!black, anchor=north west},
+  item/.style={rounded corners=2.5pt, draw=black!35, fill=white, align=left, text width=#1, inner sep=3pt,
+               font=\sffamily\tiny},
+  it/.style={rounded corners=2.5pt, draw=black!35, fill=white, align=left, inner sep=3pt, font=\sffamily\tiny},
+  arr/.style={->, line width=1.1pt, black!65},
+  loop/.style={->, line width=1pt, #1},
+  badge/.style={circle, fill=#1!70!black, text=white, font=\sffamily\tiny\bfseries, inner sep=1.2pt, minimum size=0.36cm},
+]
+% ---------------------------------------------------------------- column 1
+\node[panel=blue, minimum width=3.6cm, minimum height=5.35cm, anchor=north west] (c1) at (0,0) {};
+\node[ptitle=blue] at (c1.north west) {\,\tikz[baseline=-0.6ex]\node[badge=blue]{1};\ Virtual cohort};
+\node[it, text width=3.25cm, anchor=north] (g) at ($(c1.north)+(0,-0.5)$)
+  {\textbf{Patients} (150 per seed)\\general 50\% $\cdot$ COPD 20\%\\heart failure 15\% $\cdot$ tachy/hypertensive 15\%};
+% little population bar
+\begin{scope}[shift={($(g.south west)+(0.05,-0.32)$)}]
+  \fill[blue!55] (0,0) rectangle (1.6,0.16);
+  \fill[teal!55] (1.6,0) rectangle (2.25,0.16);
+  \fill[orange!60] (2.25,0) rectangle (2.74,0.16);
+  \fill[violet!55] (2.74,0) rectangle (3.23,0.16);
+\end{scope}
+\node[it, text width=3.25cm, anchor=north] (ph) at ($(g.south)+(0,-0.55)$)
+  {\textbf{Physiology} (5-min steps, 7 days)\\personal means, circadian rhythm, AR noise,\\benign exertion 1--2$\times$/day};
+% tiny vital-sign sparkline
+\draw[blue!60!black, line width=0.7pt] ($(ph.south west)+(0.1,-0.62)$)
+   -- ++(0.22,0.05) -- ++(0.22,-0.04) -- ++(0.22,0.06) -- ++(0.22,-0.05) -- ++(0.22,0.03) -- ++(0.22,0.01)
+   -- ++(0.22,0.06) -- ++(0.22,0.1) -- ++(0.22,0.13) -- ++(0.22,0.17) coordinate (spk);
+\fill[red!70] (spk) circle (0.05);
+\node[font=\sffamily\tiny, text=red!60!black, anchor=west] at ($(spk)+(0.02,-0.08)$) {critical};
+\node[it, text width=3.25cm, anchor=north] (ep) at ($(ph.south)+(0,-0.85)$)
+  {\textbf{Deterioration} after day 1\\septic or respiratory phenotype;\\critical in 3--10\,h unless treated};
+
+% ---------------------------------------------------------------- column 1b: disturbances
+\node[panel=gray, minimum width=3.6cm, minimum height=2.05cm, anchor=north west] (c1b) at (0,-5.6) {};
+\node[ptitle=gray] at (c1b.north west) {\,\tikz[baseline=-0.6ex]\node[badge=gray]{2};\ Injected disturbances};
+\node[it, text width=3.25cm, anchor=north] at ($(c1b.north)+(0,-0.45)$)
+  {\textbf{Sensor faults}: spikes, dropouts, frozen\\channels, drifting probes, detachment\\\textbf{Connectivity}: broadband outages\\($\approx$1 per 2 days, median 45 min)};
+
+% ---------------------------------------------------------------- column 2: simulator
+\node[panel=green, minimum width=5.9cm, minimum height=7.65cm, anchor=north west] (c2) at (4.0,0) {};
+\node[ptitle=green] at (c2.north west) {\,\tikz[baseline=-0.6ex]\node[badge=green]{3};\ Closed-loop discrete-event simulator};
+% training box at top
+\node[item=4.9cm, draw=teal!60, fill=teal!6, anchor=north] (train) at ($(c2.north)+(0,-0.5)$)
+  {\textbf{Risk-model training} (separate 150-patient cohort, no intervention):\\edge cleaning $\rightarrow$ 16 personalised features $\rightarrow$ logistic regression\\label: deterioration progress $\geq$ 0.3};
+\node[rounded corners=3pt, draw=black!60, fill=blue!10, minimum width=2.25cm, minimum height=1.2cm, align=center,
+      font=\sffamily\tiny, anchor=north west] (env) at ($(c2.north west)+(0.3,-1.85)$)
+  {\textbf{Environment}\\(ground truth)\\physiology, faults,\\outages};
+\node[rounded corners=3pt, draw=red!60!black, fill=red!10, minimum width=2.25cm, minimum height=1.2cm, align=center,
+      font=\sffamily\tiny, anchor=north east] (dut) at ($(c2.north east)+(-0.3,-1.85)$)
+  {\textbf{Design under test}\\sees only noisy,\\faulty, delayed data};
+\node[rounded corners=3pt, draw=orange!70!black, fill=orange!12, minimum width=5.3cm, minimum height=1.25cm, align=center,
+      font=\sffamily\tiny, anchor=north] (hum) at ($(c2.north)+(0,-4.15)$)
+  {\textbf{Human actors}\\patient: re-measures (p\,=\,0.85, 10 min), fixes device (p\,=\,0.8)\\clinician: answers in $\sim$20 min (teleconsult) / $\sim$10 min (escalation);\\treatment works with p\,=\,0.75 / 0.9, lower when sicker};
+\draw[loop=blue!60!black] ($(env.east)+(0,0.25)$) -- node[above, font=\sffamily\tiny]{observations} ($(dut.west)+(0,0.25)$);
+\coordinate (rq1) at ($(dut.south)+(-0.45,0)$);
+\coordinate (an1) at ($(dut.south)+(0.45,0)$);
+\draw[loop=red!60!black] (rq1) -- node[left, font=\sffamily\tiny]{requests} (rq1 |- hum.north);
+\draw[loop=orange!70!black] (an1 |- hum.north) -- node[right, font=\sffamily\tiny]{answers} (an1);
+\draw[loop=orange!70!black] (hum.north -| env.south) -- node[right, font=\sffamily\tiny, align=left]{treatment\\changes\\physiology} (env.south);
+\draw[arr, teal!60!black] (train.south -| dut.north) -- (dut.north);
+\node[font=\sffamily\tiny, align=center, text=black!70, anchor=north] at ($(hum.south)+(0,-0.15)$)
+  {every design sees identical physiology, fault and outage\\schedules (paired comparison, common random numbers)};
+
+% ---------------------------------------------------------------- column 3: designs
+\node[panel=violet, minimum width=3.15cm, minimum height=7.65cm, anchor=north west] (c3) at (10.3,0) {};
+\node[ptitle=violet] at (c3.north west) {\,\tikz[baseline=-0.6ex]\node[badge=violet]{4};\ Designs compared};
+\node[it, text width=2.8cm, anchor=north] (ref) at ($(c3.north)+(0,-0.5)$)
+  {\textbf{Reference designs}\\spot-check NEWS2 (4\,h)\\continuous NEWS2 (cloud)\\open-loop ML (cloud)};
+\node[it, text width=2.8cm, anchor=north, draw=red!60!black, fill=red!8] (vl) at ($(ref.south)+(0,-0.25)$)
+  {\textbf{VeriLoop} (full)};
+\node[it, text width=2.8cm, anchor=north] (abl) at ($(vl.south)+(0,-0.25)$)
+  {\textbf{Ablations} (one stage off)\\$-$ fault diagnosis \& confirmation\\$-$ outcome verification\\$-$ rule adaptation\\$-$ edge (cloud-hosted loop)\\$-$ adaptive sampling};
+\node[font=\sffamily\tiny, align=center, text=black!70, anchor=north] at ($(abl.south)+(0,-0.3)$)
+  {150 patients $\times$ 7 days\\$\times$ 5 seeds $\times$ 9 designs\\= 6{,}750 patient-weeks};
+
+% ---------------------------------------------------------------- column 4: metrics
+\node[panel=red, minimum width=3.15cm, minimum height=7.65cm, anchor=north west] (c4) at (13.85,0) {};
+\node[ptitle=red] at (c4.north west) {\,\tikz[baseline=-0.6ex]\node[badge=red]{5};\ Metrics};
+\node[it, text width=2.8cm, anchor=north] (m1) at ($(c4.north)+(0,-0.5)$) {\textbf{Safety}: episodes reaching\\critical state, lead time};
+\node[it, text width=2.8cm, anchor=north] (m2) at ($(m1.south)+(0,-0.18)$) {\textbf{Alarm burden}: false alarms,\\alert PPV};
+\node[it, text width=2.8cm, anchor=north] (m3) at ($(m2.south)+(0,-0.18)$) {\textbf{Workload}: clinician contacts,\\patient/device requests};
+\node[it, text width=2.8cm, anchor=north] (m4) at ($(m3.south)+(0,-0.18)$) {\textbf{Data quality}: fault detection,\\hours of corrupted data};
+\node[it, text width=2.8cm, anchor=north] (m5) at ($(m4.south)+(0,-0.18)$) {\textbf{System cost}: sensing duty,\\uplink, loop latency};
+\node[it, text width=2.8cm, anchor=north] (m6) at ($(m5.south)+(0,-0.18)$) {\textbf{Auditability}: ledger size,\\tamper detection};
+\node[font=\sffamily\tiny, align=center, text=black!70, anchor=north] at ($(m6.south)+(0,-0.3)$) {mean $\pm$ 95\% CI over seeds;\\Fisher's exact test};
+
+% ---------------------------------------------------------------- flow arrows between columns
+\draw[arr] (c1.east |- env.west) ++(0,0) -- (env.west);
+\draw[arr] (c1b.east) -- (c1b.east -| c2.west);
+\draw[arr] (c3.west |- dut.east) -- node[above, font=\sffamily\tiny]{plug in} (dut.east);
+\draw[arr] (c3.east |- m3.west) -- node[above, font=\sffamily\tiny]{logs} (m3.west);
+\end{tikzpicture}

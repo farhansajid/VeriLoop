@@ -1,0 +1,5 @@
+seed=0 pid=85 group=general phenotype=resp
+VeriLoop: {'onset': 519, 'ramp': 109, 'phenotype': 'resp', 'critical': False, 'resolved': True, 'first_alert': 565, 'first_effective': 592, 't_end': 662, 'alerts_during': 2, 'treatments': 2}
+ContNEWS2: {'onset': 519, 'ramp': 109, 'phenotype': 'resp', 'critical': True, 'resolved': False, 'first_alert': 594, 'first_effective': None, 't_end': 628, 'alerts_during': 1, 'treatments': 1}
+actions: [(559, 'device_check', 'suspect'), (563, 'remeasure', 'confirm'), (565, 'escalate', 'loop'), (585, 'escalate', 'verify'), (587, 'device_check', 'missing'), (587, 'escalate', 'loop'), (608, 'remeasure', 'confirm')]
+feedback: [(564, 'device_fixed', ''), (565, 'remeasure', ''), (567, 'clinician', 'treated'), (592, 'clinician', 'treated'), (593, 'device_fixed', ''), (610, 'remeasure', '')]

@@ -1,0 +1,61 @@
+% Fig. 2: lifecycle of one verified service request (swimlane / sequence view)
+\begin{tikzpicture}[
+  font=\sffamily\scriptsize,
+  >={Stealth[length=4pt]},
+  lane/.style={fill=#1!6, draw=none},
+  lname/.style={font=\sffamily\scriptsize\bfseries, text=#1!55!black, align=center, text width=1.55cm},
+  ev/.style={rounded corners=2pt, draw=#1!65!black, fill=#1!14, align=center, inner sep=2pt, font=\sffamily\tiny},
+  msg/.style={->, thick, black!65},
+  bad/.style={->, thick, red!70!black},
+  num/.style={circle, fill=black!75, text=white, font=\sffamily\tiny\bfseries, inner sep=0pt, minimum size=0.3cm},
+  hash/.style={draw=gray!60, fill=white, font=\ttfamily\tiny, inner sep=1pt, rounded corners=1pt},
+]
+\def\W{16.6}
+% lanes (y positions)
+\def\yW{0} \def\yE{-1.05} \def\yP{-2.1} \def\yC{-3.15} \def\yL{-4.05}
+\foreach \y/\c/\n in {\yW/blue/Wearable, \yE/green/Edge gateway, \yP/teal/Patient, \yC/orange/Clinician (fog), \yL/gray/Ledger\,/\,cloud}{
+  \fill[lane=\c] (0,\y-0.45) rectangle (\W,\y+0.45);
+  \node[lname=\c] at (0.85,\y) {\n};
+}
+\draw[gray!50] (1.7,0.45) -- (1.7,\yL-0.45);
+% time axis
+\draw[->, gray!70] (1.8,\yL-0.62) -- (\W,\yL-0.62) node[right, font=\sffamily\tiny, text=gray!50!black]{time};
+
+% 1: anomaly
+\node[ev=blue] (a1) at (2.55,\yW) {SpO$_2$ falls\\HR, RR rising};
+\node[ev=green] (b1) at (2.55,\yE) {risk $\geq\theta$,\\2 samples};
+\draw[msg] (a1) -- (b1);
+\node[num] at ($(b1.north west)+(-0.2,0.1)$) {1};
+% 2: confirm with patient
+\node[ev=teal] (p1) at (4.35,\yP) {rests and\\re-measures};
+\draw[msg] (b1.east) -- ++(0.35,0) |- node[pos=0.25, right, font=\sffamily\tiny]{Tier 1: re-measure} (p1.west);
+\node[ev=green] (b2) at (6.0,\yE) {spot reading\\confirms};
+\draw[msg] (p1.east) -| (b2.south);
+\node[num] at ($(p1.north west)+(-0.2,0.1)$) {2};
+% 3: escalate
+\node[ev=orange] (c1) at (7.65,\yC) {treats\\Task: in progress};
+\draw[msg] (b2.east) -- ++(0.3,0) |- node[pos=0.22, right, font=\sffamily\tiny, align=left]{Tier 2/3\\\texttt{ServiceRequest}} (c1.west);
+\node[num] at ($(c1.north west)+(-0.2,0.1)$) {3};
+% 4: verification window
+\draw[decorate, decoration={brace, amplitude=4pt, mirror}, thick, green!40!black] (8.75,\yE-0.42) -- node[below=3pt, font=\sffamily\tiny, text=green!35!black]{90-min verification window} (11.35,\yE-0.42);
+\node[ev=green] (b3) at (11.95,\yE) {no recovery\\$\Rightarrow$ re-escalate};
+\draw[msg, dashed] (c1.east) -- ++(0.45,0) node[below right, font=\sffamily\tiny, inner sep=1pt]{treated} |- (8.75,\yE);
+\draw[gray!60, dotted, thick] (8.75,\yE) -- (b3.west);
+\node[num] at ($(b3.north west)+(-0.2,0.1)$) {4};
+\node[ev=orange] (c2) at (13.7,\yC) {second\\treatment};
+\draw[bad] (b3.east) -- ++(0.3,0) |- node[pos=0.25, right, font=\sffamily\tiny, text=red!60!black]{Tier 3} (c2.west);
+\node[ev=green] (b4) at (15.6,\yE) {recovery verified\\Task: completed};
+\draw[msg, dashed] (c2.east) -| node[pos=0.75, right, font=\sffamily\tiny]{treated} (b4.south);
+\node[num] at ($(b4.north west)+(-0.2,0.1)$) {5};
+
+% sampling ticks on the wearable lane
+\foreach \x in {3.4,3.55,...,16.4} \draw[blue!50, line width=0.5pt] (\x,\yW-0.32) -- (\x,\yW-0.18);
+\node[font=\sffamily\tiny, text=blue!45!black, anchor=west] at (3.3,\yW+0.12) {risk elevated: sampling every 5 min instead of 15 min};
+% ledger: hashes under every step
+\foreach \x/\h [count=\i] in {2.55/{3f9a..}, 4.35/{b21c..}, 6.0/{77e0..}, 7.65/{c4d8..}, 11.95/{0a5f..}, 13.7/{e91b..}, 15.6/{5d2c..}}{
+  \node[hash] (h\i) at (\x,\yL) {\h};
+}
+\foreach \a [evaluate=\a as \b using int(\a+1)] in {1,...,6}
+  \draw[->, gray!60] (h\a) -- (h\b);
+\node[font=\sffamily\tiny, text=gray!45!black, anchor=west] at (8.4,\yL+0.25) {hash chain; hourly anchor to cloud};
+\end{tikzpicture}

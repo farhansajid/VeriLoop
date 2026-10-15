@@ -1,0 +1,91 @@
+% Fig. 1: VeriLoop overview — (a) deployment view, (b) the verifiable service loop.
+\begin{tikzpicture}[
+  font=\sffamily\scriptsize,
+  >={Stealth[length=4.5pt]},
+  zone/.style={rounded corners=6pt, draw=#1!55, fill=#1!7, line width=0.6pt},
+  ztitle/.style={font=\sffamily\scriptsize\bfseries, text=#1!60!black},
+  box/.style={rounded corners=3pt, draw=black!55, fill=white, align=center, inner sep=3pt},
+  link/.style={->, line width=0.9pt, black!65},
+  stage/.style={circle, draw=#1!70!black, fill=#1!18, line width=0.9pt, minimum size=1.55cm, align=center,
+                inner sep=0pt, font=\sffamily\scriptsize},
+  fb/.style={->, thick, red!70!black, dashed},
+  fbl/.style={font=\sffamily\tiny, text=red!60!black, fill=white, inner sep=1pt, align=center},
+]
+% ====================================================================== (a)
+\begin{scope}
+\node[zone=blue, minimum width=4.6cm, minimum height=4.3cm, anchor=north west] (home) at (0,0) {};
+\node[ztitle=blue, anchor=north west] at (home.north west) {\,Patient's home};
+% person
+\begin{scope}[shift={(1.0,-2.15)}]
+  \fill[blue!45!black!70] (0,0.72) circle (0.22);
+  \fill[blue!45!black!70] (-0.33,-0.55) rectangle (0.33,0.42);
+  \fill[blue!45!black!70, rounded corners=2pt] (-0.33,0.42) -- (0.33,0.42) -- (0.33,0.3) -- (-0.33,0.3) -- cycle;
+  \draw[blue!45!black!70, line width=3pt, line cap=round] (0.33,0.3) -- (0.62,-0.15);
+  \draw[blue!45!black!70, line width=3pt, line cap=round] (-0.33,0.3) -- (-0.5,-0.3);
+  \draw[blue!45!black!70, line width=3.4pt, line cap=round] (-0.17,-0.55) -- (-0.2,-1.15);
+  \draw[blue!45!black!70, line width=3.4pt, line cap=round] (0.17,-0.55) -- (0.2,-1.15);
+  % wearable
+  \node[draw=orange!80!black, fill=orange!35, rounded corners=1.5pt, minimum width=0.28cm, minimum height=0.2cm,
+        inner sep=0pt, rotate=-55] (watch) at (0.55,-0.05) {};
+\end{scope}
+\node[font=\sffamily\tiny, align=center, text=black!75] at (1.0,-3.75) {wearable: HR, RR,\\SpO$_2$, SBP, Temp};
+% gateway (phone)
+\node[draw=black!70, fill=green!12, rounded corners=3pt, minimum width=0.7cm, minimum height=1.1cm] (gw) at (3.55,-2.35) {};
+\fill[white] ($(gw.center)+(-0.26,-0.36)$) rectangle ($(gw.center)+(0.26,0.42)$);
+\fill[black!60] ($(gw.south)+(0,0.08)$) circle (0.035);
+\node[font=\sffamily\tiny, align=center, anchor=north] at ($(gw.south)+(0,-0.05)$) {\textbf{edge gateway}\\clean, risk, decide,\\verify, ledger};
+\draw[dashed, orange!80!black, thick] (watch) .. controls +(0.5,0.5) and +(-0.6,-0.1) .. node[above, sloped, font=\sffamily\tiny, text=orange!60!black]{BLE} (gw.west);
+% spot-check device
+\node[box, font=\sffamily\tiny, fill=yellow!20] (spot) at (3.55,-0.95) {spot-check kit};
+\end{scope}
+
+% care team (fog)
+\begin{scope}[shift={(6.1,0)}]
+\node[zone=orange, minimum width=3.3cm, minimum height=1.95cm, anchor=north west] (care) at (0,0) {};
+\node[ztitle=orange, anchor=north west] at (care.north west) {\,Care team (fog)};
+% clinic icon
+\begin{scope}[shift={(0.65,-1.25)}]
+  \fill[orange!60!black!70] (-0.38,-0.35) rectangle (0.38,0.25);
+  \fill[orange!60!black!70] (-0.45,0.25) -- (0,0.55) -- (0.45,0.25) -- cycle;
+  \fill[white] (-0.05,-0.12) rectangle (0.05,0.18);
+  \fill[white] (-0.14,-0.02) rectangle (0.14,0.08);
+\end{scope}
+\node[font=\sffamily\tiny, align=left, anchor=west] at (1.2,-1.15) {teleconsult\,/\,escalation\\treatment, labels\\(``false alarm'')};
+
+\node[zone=violet, minimum width=3.3cm, minimum height=2.15cm, anchor=north west] (cloud) at (0,-2.15) {};
+\node[ztitle=violet, anchor=north west] at (cloud.north west) {\,Cloud};
+\node[cloud, cloud puffs=11, draw=violet!70!black, fill=violet!20, minimum width=1.2cm, minimum height=0.75cm,
+      line width=0.7pt] at (0.75,-3.4) {};
+\node[font=\sffamily\tiny, align=left, anchor=west] at (1.35,-3.35) {EHR via FHIR\\ledger anchors\\model governance};
+\end{scope}
+
+\draw[link, <->] ($(gw.north east)+(0,-0.15)$) -- node[above, sloped, font=\sffamily\tiny, pos=0.6]{cellular: alerts\,/\,outcomes} ($(care.west)+(0,-0.3)$);
+\draw[link, violet!70!black] ($(gw.south east)+(0,0.15)$) -- node[above, sloped, font=\sffamily\tiny, pos=0.42]{broadband: summaries, anchors} ($(cloud.west)+(0,0.1)$);
+\draw[link, black!50] (spot.south) -- (gw.north);
+\node[font=\sffamily\bfseries\small] at (4.7,-5.1) {(a) Deployment};
+
+% ====================================================================== (b)
+\begin{scope}[shift={(13.6,-2.15)}]
+\def\R{1.72}
+\node[stage=blue]   (s1) at (90:\R)   {\textbf{Sense}};
+\node[stage=green]  (s2) at (18:\R)   {\textbf{Interpret}};
+\node[stage=green]  (s3) at (-54:\R)  {\textbf{Decide}};
+\node[stage=orange] (s4) at (-126:\R) {\textbf{Execute}};
+\node[stage=red]    (s5) at (162:\R)  {\textbf{Validate}};
+\foreach \a/\b in {s1/s2, s2/s3, s3/s4, s4/s5, s5/s1}
+  \draw[->, line width=1.3pt, black!70, shorten >=2pt, shorten <=2pt] (\a) to[bend left=24] (\b);
+% feedback chords from Validate
+\draw[fb] (s5) to[bend right=8] node[fbl, pos=0.42]{escalate if\\not verified} (s3);
+\draw[fb] (s5) to[bend left=6] node[fbl, pos=0.5]{adapt\\rules} (s2);
+% stage annotations outside the wheel
+\node[font=\sffamily\tiny, align=left, anchor=west, text=black!75] at ($(s1)+(0.85,0.25)$) {5/15-min adaptive\\duty cycle};
+\node[font=\sffamily\tiny, align=left, anchor=west, text=black!75] at ($(s2)+(0.85,0)$) {fault diagnosis,\\personal baseline,\\risk model};
+\node[font=\sffamily\tiny, align=left, anchor=west, text=black!75] at ($(s3)+(0.85,-0.1)$) {tiered service\\contract + NEWS2\\guardrails};
+\node[font=\sffamily\tiny, align=right, anchor=east, text=black!75] at ($(s4)+(-0.85,-0.1)$) {re-measure, device\\check, teleconsult,\\escalation};
+\node[font=\sffamily\tiny, align=right, anchor=east, text=black!75] at ($(s5)+(-0.85,0)$) {confirm data,\\verify outcome,\\bounded adaptation};
+% ledger bar
+\node[draw=gray!60, fill=gray!12, rounded corners=3pt, minimum width=6.4cm, minimum height=0.42cm,
+      font=\sffamily\tiny, align=center] at (0,-2.45) {every iteration $\rightarrow$ SHA-256 hash-chained provenance ledger};
+\node[font=\sffamily\bfseries\small] at (0,-2.95) {(b) Verifiable service loop};
+\end{scope}
+\end{tikzpicture}
