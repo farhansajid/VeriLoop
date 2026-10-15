@@ -189,20 +189,7 @@ VeriLoop/
 │   ├── stats.json                 # P-values and odds ratios
 │   ├── results.png                # Comparative evaluation plots
 │   └── case_trace.png             # End-to-end case trace plot
-├── paper/                         # Reference LaTeX manuscript (IEEEtran)
-│   ├── main.tex                   # Manuscript source
-│   ├── main.pdf                   # Compiled PDF
-│   ├── refs.bib                   # Bibliography database
-│   └── figures/                   # Vector TikZ and PDF figures
-└── paper_miot/                    # Final submission manuscript (IEEE IoT Magazine)
-    ├── main.tex                   # Submission manuscript source
-    ├── main.pdf                   # Compiled submission PDF
-    ├── IEEEmiot.cls               # Official IEEE IoT Magazine class
-    ├── mcomstd.sty                # Communications Society style package
-    ├── refs.bib                   # Bibliography database
-    └── figures/                   # High-resolution vector figures
 ```
-
 ---
 
 ## 🚀 Quick Start & Reproducibility
